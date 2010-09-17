@@ -36,7 +36,8 @@ def convert(input,qual,output):
 
     for qual in quals:
         if db.has_key(qual.name):
-            print qual.format("qual"),
+            print qual.name
+            print " ".join([str(x) for x in qual.letter_annotations["phred_quality"]])
     qual_handle.close()
     db.close()
 
