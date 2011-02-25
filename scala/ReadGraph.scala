@@ -23,7 +23,7 @@ case class NR(val nodeId:Int,val numberOfReads:Int,reads:Array[ReadPos])
 case class NodePos(val nodeId:Int,val offsetFromStart:Int,
 		   val startCoord:Int,val endCoord:Int,val offsetFromEnd:Int)
 
-case class Seq(val seqId:Int,nodes:Array[NodePos]) 
+case class SEQ(val seqId:Int,nodes:Array[NodePos]) 
      extends Thing
 
 object ReadGraph {
@@ -101,14 +101,14 @@ object ReadGraph {
 	  ab += new NodePos(vals(0),vals(1),vals(2),vals(3),vals(4))
 	}
       } while(newState == 'None && lines.hasNext)
-      val seq = new Seq(vals(0),ab.toArray)
+      val seq = new SEQ(vals(0),ab.toArray)
       (Some(newLine),seq)
     } else 
-      (None,new Seq(vals(0),Array[NodePos]()))
+      (None,new SEQ(vals(0),Array[NodePos]()))
   }
 
   @tailrec
-  def readItem(line:String,lines:Iterator[String],acc:List[Thing]): List[Thing] = {
+  def readThing(line:String,lines:Iterator[String],acc:List[Thing]): List[Thing] = {
     val (newLine,thing) = readState(line) match {
       case 'Node => readNode(line,lines)
       case 'Arc => readArc(line,lines)
@@ -121,7 +121,7 @@ object ReadGraph {
       acc
     else
       newLine match {
-	case Some(ll) => readItem(ll,lines,thing :: acc)
+	case Some(ll) => readThing(ll,lines,thing :: acc)
 	case None => acc
       }
   }
@@ -134,9 +134,9 @@ object ReadGraph {
     println(header)
 
     if (lines.hasNext)
-      readItem(lines.next(),lines,List[Thing]())
+      readThing(lines.next(),lines,Nil)
     else
-      List[Thing]()
+      Nil
   }
 
   def main(args:Array[String]) {
