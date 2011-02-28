@@ -4,12 +4,11 @@ case class Sequence(val id:String,val text:String)
 
 object ReadFasta {
   
-  def readFasta(in:Source):List[Sequence] = {
+  def readFasta(in:Source):Iterator[Sequence] = {
     def readFasta0(header:String,
 		   lines:Iterator[String],
 		   acc:List[Sequence]): List[Sequence] = {
 
-      println("header: " + header)
       var line = ""
       val sb = new StringBuilder()
 
@@ -19,9 +18,9 @@ object ReadFasta {
       } while (lines.hasNext && !line.startsWith(">"))
       if (lines.hasNext) { 
 	readFasta0(line,lines,
-		   new Sequence(header,sb.toString) :: acc)
+		   new Sequence(header.stripPrefix(">"),sb.toString) :: acc)
       } else {
-	(new Sequence(header,sb.toString)) :: acc
+	(new Sequence(header.stripPrefix(">"),sb.toString)) :: acc
       }
 
     }
@@ -32,13 +31,13 @@ object ReadFasta {
     do {
       line = lines.next
     } while (!line.startsWith(">"))
-    readFasta0(line,lines,Nil)
+    readFasta0(line,lines,Nil).reverse.iterator
   }
 
   def main(args:Array[String]) {
     if (args.length > 0) {
       val seqs = readFasta(Source.fromFile(args(0)))
-      println(seqs)
+      for(seq <- seqs) println(seq)
     } else {
       println("Missing arg")
     }
