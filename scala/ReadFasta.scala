@@ -4,41 +4,31 @@ import scala.annotation.tailrec
 package bio {
   case class BioSeq(val id:String,val text:String)
 
-  object ReadFasta {
+  class BioSeqIterator(lines:Iterator[String]) extends Iterator[BioSeq] {
+    private var lastLine = ""
     
+    while(lines.hasNext && !lastLine.startsWith(">")) {
+      lastLine = lines.next
+    }
+    
+    def next:BioSeq = {
+      val sb = new StringBuilder()
+      val header = lastLine
+      do {
+	lastLine = lines.next
+	if (!lastLine.startsWith(">")) sb.append(lastLine)
+      } while (lines.hasNext && !lastLine.startsWith(">"))      
+
+      return new BioSeq(header.stripPrefix(">"),sb.toString)
+    }
+
+    def hasNext = lines.hasNext
+  }
+
+  object ReadFasta {
+
     def readFasta(in:Source):Iterator[BioSeq] = {
-
-      @tailrec
-      def readFasta0(header:String,
-		     lines:Iterator[String],
-		     acc:List[BioSeq]): List[BioSeq] = {
-
-	var line = ""
-	val sb = new StringBuilder()
-
-	do {
-	  line = lines.next
-	  //Console.err.println("# " + line)
-	  
-	  if (!line.startsWith(">")) sb.append(line)
-	} while (lines.hasNext && !line.startsWith(">"))
-
-	if (lines.hasNext) { 
-	  readFasta0(line,lines,
-		     new BioSeq(header.stripPrefix(">"),sb.toString) :: acc)
-	} else {
-	  (new BioSeq(header.stripPrefix(">"),sb.toString)) :: acc
-	}
-
-      }
-
-      val lines = in.getLines();
-      var line = ""
-      
-    do {
-      line = lines.next
-    } while (!line.startsWith(">"))
-      readFasta0(line,lines,Nil).reverse.iterator
+      return new BioSeqIterator(in.getLines)
     }
 
     def main(args:Array[String]) {
