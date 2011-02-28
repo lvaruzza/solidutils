@@ -9,13 +9,19 @@ object ReadFasta {
 		   lines:Iterator[String],
 		   acc:List[Sequence]): List[Sequence] = {
 
-      val (seq,rest) = lines.partition(_.startsWith(">"))
-      println("# " + header + " " + seq.toArray.mkString(""))
-      if (rest.hasNext) { 
-	readFasta0(rest.next,rest,
-		   new Sequence(header,seq.toArray.mkString("")) :: acc)
+      println("header: " + header)
+      var line = ""
+      val sb = new StringBuilder()
+
+      do {
+	line = lines.next
+	if (!line.startsWith(">")) sb.append(line)
+      } while (lines.hasNext && !line.startsWith(">"))
+      if (lines.hasNext) { 
+	readFasta0(line,lines,
+		   new Sequence(header,sb.toString) :: acc)
       } else {
-	acc
+	(new Sequence(header,sb.toString)) :: acc
       }
 
     }
