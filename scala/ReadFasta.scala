@@ -1,45 +1,53 @@
 import scala.io.Source
+import scala.annotation.tailrec
 
-case class Sequence(val id:String,val text:String)
+package bio {
+  case class BioSeq(val id:String,val text:String)
 
-object ReadFasta {
-  
-  def readFasta(in:Source):Iterator[Sequence] = {
-    def readFasta0(header:String,
-		   lines:Iterator[String],
-		   acc:List[Sequence]): List[Sequence] = {
+  object ReadFasta {
+    
+    def readFasta(in:Source):Iterator[BioSeq] = {
 
-      var line = ""
-      val sb = new StringBuilder()
+      @tailrec
+      def readFasta0(header:String,
+		     lines:Iterator[String],
+		     acc:List[BioSeq]): List[BioSeq] = {
 
-      do {
-	line = lines.next
-	if (!line.startsWith(">")) sb.append(line)
-      } while (lines.hasNext && !line.startsWith(">"))
-      if (lines.hasNext) { 
-	readFasta0(line,lines,
-		   new Sequence(header.stripPrefix(">"),sb.toString) :: acc)
-      } else {
-	(new Sequence(header.stripPrefix(">"),sb.toString)) :: acc
+	var line = ""
+	val sb = new StringBuilder()
+
+	do {
+	  line = lines.next
+	  //Console.err.println("# " + line)
+	  
+	  if (!line.startsWith(">")) sb.append(line)
+	} while (lines.hasNext && !line.startsWith(">"))
+
+	if (lines.hasNext) { 
+	  readFasta0(line,lines,
+		     new BioSeq(header.stripPrefix(">"),sb.toString) :: acc)
+	} else {
+	  (new BioSeq(header.stripPrefix(">"),sb.toString)) :: acc
+	}
+
       }
 
-    }
-
-    val lines = in.getLines();
-    var line = ""
-    
+      val lines = in.getLines();
+      var line = ""
+      
     do {
       line = lines.next
     } while (!line.startsWith(">"))
-    readFasta0(line,lines,Nil).reverse.iterator
-  }
+      readFasta0(line,lines,Nil).reverse.iterator
+    }
 
-  def main(args:Array[String]) {
-    if (args.length > 0) {
-      val seqs = readFasta(Source.fromFile(args(0)))
-      for(seq <- seqs) println(seq)
-    } else {
-      println("Missing arg")
+    def main(args:Array[String]) {
+      if (args.length > 0) {
+	val seqs = readFasta(Source.fromFile(args(0)))
+	for(seq <- seqs) println(seq)
+      } else {
+	println("Missing arg")
+      }
     }
   }
 }
