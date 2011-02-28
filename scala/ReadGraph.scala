@@ -126,7 +126,7 @@ object ReadGraph {
       }
   }
 
-  def readGraph(in:Source):List[Thing] = {
+  def readGraph(in:Source):Iterator[Thing] = {
     val lines = in.getLines
 
     val header = lines.next
@@ -134,9 +134,9 @@ object ReadGraph {
     println(header)
 
     if (lines.hasNext)
-      readThing(lines.next(),lines,Nil)
+      readThing(lines.next(),lines,Nil).iterator
     else
-      Nil
+      Nil.iterator
   }
 
   def main(args:Array[String]) {
