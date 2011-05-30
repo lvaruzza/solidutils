@@ -49,7 +49,7 @@ while (my $seq = $seqio->next_seq) {
     }
     #print "last_line = $last_line\n";
 
-    my $endpos = $pos + length($seq->seq) + $N_seps;
+    my $endpos = $pos + length($seq->seq);
 
     print GTF join("\t",
 	       $genome_name,
@@ -62,7 +62,7 @@ while (my $seq = $seqio->next_seq) {
 	       "0",
 	       join("; ","gene_id \"$name\"","transcript_id \"$name\"") . ";"
 	),"\n";
-    $pos = $endpos;
+    $pos = $endpos + $N_seps;
 }
 print GENOME $last_line,"\n";
 
