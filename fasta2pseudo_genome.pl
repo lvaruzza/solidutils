@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use Bio::SeqIO;
 use Getopt::Declare;
 use strict;
