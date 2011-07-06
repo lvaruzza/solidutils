@@ -35,7 +35,7 @@ while(<>) {
     #print "$type $t_id $g_id $count $en\n";
 
     if (!($type eq "exon")) {
-	$sum += $count;
+	
     }
 
     #print "attr = ",Dumper($attr),"\n";
