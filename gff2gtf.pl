@@ -22,6 +22,18 @@ my $spec = q(
 my $parser = new Getopt::Declare $spec;
 
 
+if ($input_filename == undef) {
+    print STDERR "ERROR: Missing input filename\n";
+    $parser->usage();
+    exit;
+}
+
+if ($output_filename == undef) {
+    print STDERR "ERROR: Missing output filename\n";
+    $parser->usage();
+    exit;
+}
+
 # Read the genes
 
 print STDERR "Reading Transcripts from $input_filename\n";
